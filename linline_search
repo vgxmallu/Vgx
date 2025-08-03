@@ -1,0 +1,176 @@
+from spotipy.oauth2 import SpotifyClientCredentials
+import os
+import spotipy
+from youtubesearchpython import SearchVideos
+from pyrogram import Client, errors
+from pyrogram.types import (
+    InlineQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+)
+from config import SPOTIPY_CLIENT_SECRET, SPOTIPY_CLIENT_ID
+#from mbot import Mbot
+
+SPOTIPY_CLIENT_ID = SPOTIPY_CLIENT_ID
+SPOTIPY_CLIENT_SECRET = SPOTIPY_CLIENT_SECRET
+client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+# Set up Spotify API credentials
+"""
+client_id = 'SPOTIPY_CLIENT_ID'
+client_secret = 'SPOTIPY_CLIENT_SECRET'
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
+"""
+buttons = [
+    [
+        InlineKeyboardButton("🟣Deezer", callback_data="deez")
+     ],[
+        InlineKeyboardButton("Search Track", switch_inline_query_current_chat="dt "),
+        InlineKeyboardButton("Search Album", switch_inline_query_current_chat="da ")
+     ],[
+        InlineKeyboardButton("🟢Spotify", callback_data="deez")
+     ],[
+        InlineKeyboardButton("Search Track", switch_inline_query_current_chat="st "),
+        InlineKeyboardButton("Search Album",  switch_inline_query_current_chat="sa ")
+     ],[
+        InlineKeyboardButton("YouTube Search",  switch_inline_query_current_chat="yt ")
+    ]
+]
+@Client.on_inline_query()
+async def search_sp(client: Client, query: InlineQuery):
+    qry = query.query.strip()
+    iq = qry.lower()
+    if iq == "":
+        answer = [
+            InlineQueryResultArticle(
+                title="〽️ Music𝕏DlBot ™️",
+                description="💙You can Search, Download and Listening Tracks And Albums From Your Favourite Artists.",
+                thumb_url="https://telegra.ph/file/71218f368f1c5fcaa9043.jpg",
+                input_message_content=InputTextMessageContent("Choose:"),
+                reply_markup=InlineKeyboardMarkup(buttons)
+            ),
+            InlineQueryResultArticle(
+                title="〽️ Music𝕏DlBot ™️",
+                description="💙You can Search, Download and Listening Tracks And Albums From Your Favourite Artists.",
+                thumb_url="https://telegra.ph/file/71218f368f1c5fcaa9043.jpg",
+                input_message_content=InputTextMessageContent("Choose:"),
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+        ]
+        await query.answer(results=answer, cache_time=5)
+
+#=========================YouTube==================
+    elif iq.startswith("yt"):
+        result = []
+        input_query = (iq.split("yt", maxsplit=1)[1]).strip()
+        if not input_query:
+            result.append(
+                InlineQueryResultArticle(
+                    title="Yt Search",
+                    description="Search Inline YouTube videos",
+                    thumb_url ="https://telegra.ph/file/bb46f4c6ae9d255abe6df.jpg",
+                    input_message_content=InputTextMessageContent("Inline tool to Search YouTube videos"),
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton(
+                            text="Search Now🔎",
+                            switch_inline_query_current_chat="yt ",
+                        )]
+                    ]
+                    )
+                )
+            )
+            await query.answer(results=result, cache_time=5, switch_pm_text="Welcome To @MusicX_DlBot", switch_pm_parameter="help")
+            return
+        search = SearchVideos(str(input_query), offset=1, mode="dict", max_results=20)
+        result_yt = search.result()["search_result"]
+        for i in result_yt:
+            link = i["link"]
+            vid_title = i["title"]
+            yt_id = i["id"]
+            uploader = i["channel"]
+            time = i["duration"]
+            #views = i["views"]
+            #publish = i["publishTime"]
+            thumb = f"https://img.youtube.com/vi/{yt_id}/hqdefault.jpg"
+            #caption = f"{link}"
+            result.append(
+                InlineQueryResultArticle(
+                    title=vid_title,
+                    description=f"Channel: {uploader}\nDuration: {time}",
+                    input_message_content=InputTextMessageContent(
+                        f"{link}" #.format(track['external_urls']['spotify'])
+                    ),
+                    thumb_url=thumb,
+                )
+            )
+        await query.answer(results=result, cache_time=0)
+        
+    elif iq.startswith("st"):
+        result = []
+        input_q = (iq.split("st", maxsplit=1)[1]).strip()
+        if not input_q:
+            result.append(
+                InlineQueryResultArticle(
+                    title="Spotify Search",
+                    description="Search Inline Spotify Music.",
+                    thumb_url ="https://telegra.ph/file/863bcca7f824607f5257a.jpg",
+                    input_message_content=InputTextMessageContent("Inline tool to Search Spotify Musics"),
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton(
+                            text="Search Now🔎",
+                            switch_inline_query_current_chat="st ",
+                        )]
+                    ]
+                    )
+                )
+            )
+            await query.answer(results=result, cache_time=5, switch_pm_text="Welcome To @MusicX_DlBot", switch_pm_parameter="help")
+            return
+        #for track in enumerate(tracks['tracks']['items']):
+        results = spotify.search(str(input_q), type='track', limit=10) #['tracks']['items'] #result_sp = search.result()["search_result"]
+        for song in results['tracks']['items']:
+            song_name = song['name']
+            artist = song['artists'][0]['name']
+            album_cover = song['album']['images'][0]['url']
+            url = song['external_urls']['spotify']
+            result.append(
+                InlineQueryResultArticle(
+                    title=song_name, 
+                    description=f"Name: {song_name}\nArtist: {artist}"
+                    ),
+                    input_message_content=InputTextMessageContent(
+                        f"{url}" #.format(track['external_urls']['spotify'])
+                    ),
+                    thumb_url=album_cover,
+            )
+        await query.answer(results=result, cache_time=0)
+#views = i["views"]
+#publish = i["publishTime"]
+#× **Title:** {vid_title}
+#× **Channel:** {uploader}
+#× **Views:** `{views}views`
+#× **Duration:** `{time}`
+#× **Published:** {publish}
+#"""
+#reply_markup=InlineKeyboardMarkup(
+#                        [
+#                            [
+#                                InlineKeyboardButton(
+#                                    text="🎥 Watch Now",
+#                                    url=link
+#                                ),
+#                                InlineKeyboardButton(
+#                                    text="🔎 Search Again",
+#                                    switch_inline_query_current_chat=f"yt{iq}"
+#                                ),
+#                            ]
+#                        ]
+#                    )
+#                )
+#            )
+
+    
+        
+

@@ -1,0 +1,219 @@
+
+
+from __future__ import unicode_literals
+from pyrogram import Client , filters 
+from os import environ,execl
+from sys import executable
+from pyrogram.errors import FloodWait 
+from pyrogram.types import Message , InlineKeyboardMarkup, InlineKeyboardButton ,CallbackQuery
+from pyrogram.errors import FloodWait 
+from asyncio import sleep
+#from database.users_chats_db import db
+#from utils import get_size
+from shazamio import Shazam
+#import math
+import asyncio
+import time
+#import shlex
+#import aiofiles
+#import aiohttp
+#import wget
+import os
+#from asgiref.sync import sync_to_async
+from requests import get
+import datetime
+from json import JSONDecodeError
+import requests
+#import ffmpeg 
+from pyrogram.errors import FloodWait, MessageNotModified
+from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
+#from youtubesearchpython import VideosSearch
+import yt_dlp
+#from youtube_search import YoutubeSearch
+import requests
+from typing import Tuple
+from pyrogram import filters
+from pyrogram import Client
+#from mbot import OWNER_ID as ADMINS
+import time
+
+from handlers.shazam import humanbytes, edit_or_reply, fetch_audio
+from handlers.util import run_cmd as runcmd
+from mbot import CMD, Mbot
+from config import LOG_CHANNEL
+ 
+SHZ = """
+💱**LOG ALERT FOR SHAZAM**♻️
+
+📛**Triggered Command** : /shazam 
+👤**Name** : {}
+👾**Username** : @{}
+💾**DC** : {}
+♐**ID** : `{}`
+🤖**BOT** : @Musicx_dlbot
+
+#shazam
+"""
+
+NOT_SUPPORT = [ ]
+ADMINS = 784589736
+def get_arg(message):
+    msg = message.text
+    msg = msg.replace(" ", "", 1) if msg[1] == " " else msg
+    split = msg[1:].replace("\n", " \n").split(" ")
+    if " ".join(split[1:]).strip() == "":
+        return ""
+    return " ".join(split[1:])
+#@sync_to_async
+def thumb_down(album_id,img):
+    with open(f"/tmp/thumbnails/{album_id}.jpg","wb") as file:
+        file.write(get(img).content)
+    return f"/tmp/thumbnails/{album_id}.jpg"
+
+def time_to_seconds(time):
+    stringt = str(time)
+    return sum(int(x) * 60 ** i for i, x in enumerate(reversed(stringt.split(':'))))
+
+
+async def shazam(file):
+    shazam = Shazam()
+    try:
+        r = await shazam.recognize_song(file)
+    except:
+        return None, None, None
+    if not r:
+        return None, None, None
+    track = r.get("track")
+    nt = track.get("images")
+    image = nt.get("coverarthq")
+    by = track.get("subtitle")
+    title = track.get("title")
+    return image, by, title
+
+async def convert_to_audio(vid_path):
+    stark_cmd = f"ffmpeg -i {vid_path} -map 0:a friday.mp3"
+    await runcmd(stark_cmd)
+    final_warner = "friday.mp3"
+    if not os.path.exists(final_warner):
+        return None
+    return final_warner
+
+@Mbot.on_message(filters.command("shazam", CMD))
+async def shazam_find(client, message):
+    #stime = time.time()
+    h = await client.send_message(LOG_CHANNEL, SHZ.format(message.from_user.mention, message.from_user.username, message.from_user.dc_id, message.from_user.id))
+    msg = await message.reply_text("Shazaming This Song.")
+    if not message.reply_to_message:
+        return await msg.edit("Reply To Audio, Video, Voice files etc,")
+    if not (message.reply_to_message.audio or message.reply_to_message.voice or message.reply_to_message.video):
+        return await msg.edit("Reply To Audio File.")
+    if message.reply_to_message.video:
+        video_file = await message.reply_to_message.download()
+        music_file = await convert_to_audio(video_file)
+        dur = message.reply_to_message.video.duration
+        if not music_file:
+            return await msg.edit("`Unable To Convert To Song File. Is This A Valid File?`")
+    elif (message.reply_to_message.voice or message.reply_to_message.audio):
+        dur = message.reply_to_message.voice.duration if message.reply_to_message.voice else message.reply_to_message.audio.duration
+        music_file = await message.reply_to_message.download()
+    size_ = humanbytes(os.stat(music_file).st_size)
+    dur = datetime.timedelta(seconds=dur)
+    thumb, by, title = await shazam(music_file)
+    if title is None:
+        return await msg.edit("`No Results Found.`")
+    #Setime = time.time()
+    #t_k = round(etime - stime)
+
+    spoti_url = "https://open.spotify.com/search/results/"
+    surl = spoti_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(surl)
+    google_url = "https://www.google.com/search?q="
+    goglurl = google_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(goglurl) 
+    soundc_url = "https://soundcloud.com/search?q="
+    sdcurl = soundc_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(sdcurl)
+    youtube_url = "https://www.youtube.com/results?search_query="
+    ytsurl = youtube_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(ytsurl) 
+    ytmusic_url = "https://music.youtube.com/search?q="
+    ytmurl = ytmusic_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(ytmurl) 
+    applem_url = "https://music.apple.com/search?term="
+    appmurl = applem_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(appmurl)   
+    deezer_url = "https://www.deezer.com/search/"
+    dezurl = deezer_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(dezurl)
+    tidal_url = "https://listen.tidal.com/search/"
+    tidaurl = tidal_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(tidaurl)
+    pandora_url = "https://www.pandora.com/search/"
+    pandrurl = pandora_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(pandrurl)
+
+    iheart_url = "https://www.iheart.com/search?q="
+    iheturl = iheart_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(iheturl)
+
+    amezom_url = "https://music.amazon.com/search/"
+    amzmurl = amezom_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(amzmurl)
+    itunes_url = "https://geo.music.apple.com/search?term="
+    itunsurl = itunes_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(itunsurl)
+    napsr_url = "https://us.napster.com/search?q="
+    napsrurl = napsr_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(napsrurl)
+    wynk_url = "https://wynk.in/music/search?q="
+    wynkurl = wynk_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(wynkurl)
+    qobuz_url = "https://www.qobuz.com/search?q="
+    qobuzurl = qobuz_url + title.replace(' ', '+') + by.replace(' ', '+')
+    print(qobuzurl)
+
+    advancebott = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("YouTube", url=f"{ytsurl}"), 
+                InlineKeyboardButton("YouTube Music", url=f"{ytmurl}"), 
+                InlineKeyboardButton("Spotify", url=f"{surl}")
+                ],[ 
+                InlineKeyboardButton("Sound Cloud", url=f"{sdcurl}"), 
+                InlineKeyboardButton("Deezer", url=f"{dezurl}"), 
+                InlineKeyboardButton("Wynk", url=f"{wynkurl}")
+                ],[
+                InlineKeyboardButton("Apple Music", url=f"{appmurl}"),
+                InlineKeyboardButton("iHeart", url=f"{iheturl}"),
+                InlineKeyboardButton("Tidal", url=f"{tidaurl}")
+                ],[
+                InlineKeyboardButton("Pandora", url=f"{pandrurl}"), 
+                InlineKeyboardButton("Amazon Music", url=f"{amzmurl}"), 
+                InlineKeyboardButton("Google", url=f"{goglurl}")
+                ],[
+                InlineKeyboardButton("Napster", url=f"{napsrurl}"), 
+                InlineKeyboardButton("Wynk", url=f"{wynkurl}"), 
+                InlineKeyboardButton("Qobuz", url=f"{qobuzurl}") 
+                ],[
+                InlineKeyboardButton('❌', callback_data='close')
+            ]
+        ]
+    )
+    caption = f"""
+🎧<b>Title :</b> {title}
+🧑‍🎤<b>Singer :</b> {by}
+⏳<b>Duration :</b> <code>{dur}</code>
+📏<b>Size :</b> <code>{size_}</code>
+ 
+ ©️ <b>By @Musicx_dlbot</b>
+**Please choose a service below**
+    """
+    if thumb:
+        await msg.delete()
+        await message.reply_to_message.reply_photo(thumb, caption=caption, reply_markup=advancebott, quote=True)
+     
+    else:
+        await msg.edit(caption)
+    os.remove(music_file)
+    if thumb:
+       os.remove(thumb)

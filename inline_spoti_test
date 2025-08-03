@@ -1,0 +1,152 @@
+from pyrogram import Client, errors
+from pyrogram.types import (
+    InlineQuery,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+)
+from config import SPOTIPY_CLIENT_SECRET, SPOTIPY_CLIENT_ID
+from mbot import Mbot
+from spotipy.oauth2 import SpotifyClientCredentials
+import os
+import spotipy
+
+
+SPOTIPY_CLIENT_ID = SPOTIPY_CLIENT_ID
+SPOTIPY_CLIENT_SECRET = SPOTIPY_CLIENT_SECRET
+
+client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+
+spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+
+@Mbot.on_inline_query()
+async def inline_spotify(client: Client, query: InlineQuery):
+    answers = []
+    results = spotify.search(query.query, limit=20, offset=0, type='track')
+    
+    if results == "":
+        await client.answer_inline_query(
+            query.id,
+            results=answers,
+            switch_pm_text="type a song name...",
+            switch_pm_parameter="help",
+            cache_time=0,
+        )
+        
+    else:
+        for track in results['tracks']['items']:
+            album_cover = track['album']['images'][0]['url']
+            url = track['external_urls']['spotify']
+            answers.append(
+                InlineQueryResultArticle(                    
+                    title=track['name'],
+                    description="{} - {}".format(
+                        track['name'], track['artists'][0]['name']
+                    ),
+                    input_message_content=InputTextMessageContent(
+                        f"{url}" #.format(track['external_urls']['spotify'])
+                    ),
+                    thumb_url=album_cover, 
+                )
+            )
+        try:
+            await query.answer(results=answers, cache_time=0)
+        except errors.QueryIdInvalid:
+            await query.answer(
+                results=answers,
+                cache_time=0,
+                switch_pm_text="error: search timed out",
+                switch_pm_parameter="",
+            )
+
+#====≠==========================
+
+from pyrogram import Client, errors
+from pyrogram.types import (
+    InlineQuery,
+    InlineQueryResultArticle,
+    InputTextMessageContent,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+)
+from config import SPOTIPY_CLIENT_SECRET, SPOTIPY_CLIENT_ID
+from mbot import Mbot
+from spotipy.oauth2 import SpotifyClientCredentials
+import os
+import spotipy
+
+
+SPOTIPY_CLIENT_ID = SPOTIPY_CLIENT_ID
+SPOTIPY_CLIENT_SECRET = SPOTIPY_CLIENT_SECRET
+
+client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
+
+spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+buttons = [
+    [
+        InlineKeyboardButton("🟣Deezer", callback_data="deez")
+     ],[
+        InlineKeyboardButton("Search Track", switch_inline_query_current_chat="dt "),
+        InlineKeyboardButton("Search Album", switch_inline_query_current_chat="da ")
+     ],[
+        InlineKeyboardButton("🟢Spotify", callback_data="deez")
+     ],[
+        InlineKeyboardButton("Search Track", switch_inline_query_current_chat="st "),
+        InlineKeyboardButton("Search Album",  switch_inline_query_current_chat="sa ")
+     ],[
+        InlineKeyboardButton("YouTube Search",  switch_inline_query_current_chat="yt ")
+    ]
+]
+
+@Mbot.on_inline_query()
+async def inline_spotify(client: Client, query: InlineQuery):
+    answers = []
+    string_given = query.query.strip()
+    iq = string_given.lower()
+    if iq == "":
+        answer = [
+            InlineQueryResultArticle(
+                title="〽️ Music𝕏DlBot ™️",
+                description="💙You can Search, Download and Listening Tracks And Albums From Your Favourite Artists.",
+                thumb_url="https://telegra.ph/file/71218f368f1c5fcaa9043.jpg",
+                input_message_content=InputTextMessageContent("Choose:"),
+                reply_markup=InlineKeyboardMarkup(buttons)
+            ),
+            InlineQueryResultArticle(
+                title="〽️ Music𝕏DlBot ™️",
+                description="💙You can Search, Download and Listening Tracks And Albums From Your Favourite Artists.",
+                thumb_url="https://telegra.ph/file/71218f368f1c5fcaa9043.jpg",
+                input_message_content=InputTextMessageContent("Choose:"),
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+        ]
+        await query.answer(results=answer, cache_time=5)
+        
+    elif iq.startswith("st"):
+        input_query = (iq.split("st", maxsplit=1)[1]).strip()
+        results = spotify.search(q=input_query, limit=20, offset=0, type='track')
+        for track in results['tracks']['items']:
+            album_cover = track['album']['images'][0]['url']
+            url = track['external_urls']['spotify']
+            answers.append(
+                InlineQueryResultArticle(                    
+                    title=track['name'],
+                    description="{} - {}".format(
+                        track['name'], track['artists'][0]['name']
+                    ),
+                    input_message_content=InputTextMessageContent(
+                        f"{url}" #.format(track['external_urls']['spotify'])
+                    ),
+                    thumb_url=album_cover, 
+                )
+            )
+        try:
+            await query.answer(results=answers, cache_time=0)
+        except errors.QueryIdInvalid:
+            await query.answer(
+                results=answers,
+                cache_time=0,
+                switch_pm_text="error: search timed out",
+                switch_pm_parameter="",
+           )

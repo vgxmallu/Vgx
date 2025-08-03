@@ -1,0 +1,358 @@
+import asyncio
+import random
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import ReplyKeyboardMarkup, ReplyKeyboardRemove
+from pyrogram import filters
+from mbot import Mbot
+from config import PICS
+
+caption1 = """
+Hello {}
+I'm here to download your music 🎶...
+
+©️ @Musicx_dlbot
+"""
+
+caption2 = """
+Hello {}
+
+Here is the list of more commands.
+× `/lyrics` - This command for scraping lyrics from a song.
+× `/ping` `/alive` - Use to ping me whenever i am dead or not. 
+× `/info` `/stickerid` `/dc` - Use to get information about you.
+× `/yt_search` - Search YouTube Videos.
+× `/spoti_search` - Search Spotify Music 🎶...
+× `/wallpapers` - To Get Wallpapers 🌇
+
+©️ @Musicx_dlbot
+"""
+ms_stt = """
+Some times bot will be slow, because of Server Overload :(
+"""
+caption3 = """
+Hello {},
+My name is ˹𝗠ᴜsɪᴄ•✘•𝗗ʟ˼ Music downloader bot.
+
+I am simple and faster music downloader bot for TG,
+&
+I can download music from Spotify, YouTube | YouTube Music, Deezer, SoundCloud, MixCloud and Facebook | Instagram platform's.
+
+Click /help for more know me...
+"""
+#==================================
+
+cap_yt = """
+Help for **YouTube | YouTube Music**
+
+Send direct **Youtube** Link in here to Download Song.
+"""
+
+cap_sp = """
+Help for **Spotify**
+
+Send **Spotify** Track/Playlist/Album Link. I'll Download It For You.
+Or Just type your song name here, i will download song from Spotify.
+"""
+
+cap_dz = """
+Help for **Deezer**
+
+Send Deezer Playlist/Album/Track Link. I'll Download It For You.
+
+**Search Deezer:**
+Now you can search Deezer Tracks and albums
+Just type `/settings`
+"""
+
+cap_svn = """
+Help for **Saavm**
+
+Send `/saavn` [song name] - To download song from Saavn. 
+"""
+
+cap_sc = """
+Help for **SoundCloud**
+
+Send **Sound Cloud** Track Link. I'll Download It For You. 
+**Example:** `https://soundcloud.com/djalvaro/aya-nakamura-djadja-alvaro-x-trobi-rmx?si=8fc58b6906d14a629d77db2b4dc80e9b&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing`
+
+If you not work above example, ok you can send link like this👇
+**Example 2**: `https://soundcloud.com/soavedusk/take-it-easy`
+"""
+
+cap_mc = """
+Help for **MixCloud**
+
+Send **Mix Cloud** Track Link. I'll Download It For You.
+if you downloading song more than 1h? you can't dl, bc limitations. 
+"""
+
+cap_fb = """
+Help for **Facebook** Video/Reels download,
+
+Send `/fbdl` then your fb video link
+eg: `/fbdl` [link]
+"""
+
+cap_ig = """
+Help for **Instagram** Video/Reels/Photos download,
+
+Send `/igdl` then your Instagram video link
+eg: `/igdl` [link]
+
+Some Tips:
+And some tips for Instagram Reels Downloader,
+you just make link like this
+`https://www.ddinstagram.com/reel/CueGLzho0bt/?igshid=MzRlODBiNWFlZA==`
+There is some **dd** in that link, that is extra added.
+you can download reels like this also 
+this tips Only work some videos.
+"""
+
+cap_muc = """
+Help for **Music** download
+
+just Send me song name with `/mp3` `/song` comments To download Music 🎶...
+and I'll send you song on Telegram
+
+Examples:
+  × `/song hope`
+  × `/mp3 hope`
+"""
+#====================================================
+@Mbot.on_message(filters.private & filters.command("help")) 
+async def mc_help(client, message):
+    await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=caption1.format(message.from_user.first_name), 
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".🎵 Music 🎵"
+            ],[
+                ".YouTube 🔴", ".Spotify 🟢", ".Deezer 🟣"
+            ],[
+                ".Saavn 🟡", ".SoundCloud 🟠", ".MixCloud 🔵"
+            ],[
+                ".Facebook Dl🌀", ".Instagram Dl👾"
+            ],[
+                ".More ♏" 
+            ],[
+                ".◀️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(3600)
+    await a.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("⟨⬅️") | filters.private & filters.regex("Help ♑")) 
+async def mc_help2(client, message):
+    a = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=caption1.format(message.from_user.first_name), 
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".🎵 Music 🎵"
+            ],[
+                ".YouTube 🔴", ".Spotify 🟢", ".Deezer 🟣"
+            ],[
+                ".Saavn 🟡", ".SoundCloud 🟠", ".MixCloud 🔵"
+            ],[
+                ".Facebook Dl🌀", ".Instagram Dl👾"
+            ],[
+                ".More ♏" 
+            ],[
+                ".◀️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(3600)
+    await a.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("More ♏") | filters.private & filters.regex("⬅️⬅️"))
+async def mc_more(client, message):
+    b = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=caption2.format(message.from_user.first_name),
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".Wallpapers 🌇"
+            ],[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await b.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("🏠") | filters.private & filters.regex("◀️"))
+async def mc_home(client, message):
+    c = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=caption3.format(message.from_user.mention),
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".Group 💌", ".Log Channel☁️"
+            ],[
+                ".Help ♑"
+            ],[
+                "❌ CLOSE ❌"
+            ]],
+            resize_keyboard=True
+        ) 
+    ) 
+    await message.reply_text(ms_stt)
+    await asyncio.sleep(3600)
+    await c.delete()
+    await message.delete()
+  
+#====================================================
+@Mbot.on_message(filters.private & filters.regex("🎵 Music 🎵"))
+async def wall_music(client, message):
+    d = await message.reply_photo(
+        photo=random.choice(PICS), 
+        caption=cap_muc, 
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await d.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("YouTube 🔴"))
+async def mc_yt(client, message):
+    e = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=cap_yt,
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await e.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("Spotify 🟢"))
+async def mc_sp(client, message):
+    f = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=cap_sp,
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await f.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("Deezer 🟣"))
+async def mc_dz(client, message):
+    g = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=cap_dz,
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await g.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("Saavn 🟡"))
+async def mc_svn(client, message):
+    h = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=cap_svn,
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await h.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("SoundCloud 🟠"))
+async def mc_sc(client, message):
+    i = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=cap_sc,
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await i.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("MixCloud 🔵"))
+async def mc_mx(client, message):
+    j = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=cap_mc,
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await j.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("Facebook Dl🌀"))
+async def mc_fb(client, message):
+    k = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=cap_fb,
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await k.delete()
+    await message.delete()
+
+@Mbot.on_message(filters.private & filters.regex("Instagram Dl👾"))
+async def mc_ig(client, message):
+    m = await message.reply_photo(
+        photo=random.choice(PICS),
+        caption=cap_ig,
+        reply_markup=ReplyKeyboardMarkup(
+            [[
+                ".⟨⬅️", "❌ CLOSE ❌", ".🏠"
+            ]], 
+            resize_keyboard=True
+        ) 
+    ) 
+    await asyncio.sleep(900)
+    await m.delete()
+    await message.delete()
+  
